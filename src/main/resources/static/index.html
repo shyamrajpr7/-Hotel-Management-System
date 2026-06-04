@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:#f4f5f7; color:#1a1a2e; }
+.navbar { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); color:white; padding:16px 32px;
+  display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 20px rgba(0,0,0,0.3); }
+.navbar h1 { font-family:'Playfair Display',serif; font-size:22px; color:#f0c040; }
+.navbar span { font-size:13px; color:#8899aa; }
+.tabs { display:flex; background:#16213e; padding:0 32px; border-bottom:1px solid #0d3b66; }
+.tab { padding:14px 22px; color:#8899aa; cursor:pointer; font-size:13px; font-weight:500;
+  border-bottom:3px solid transparent; transition:all 0.2s; }
+.tab:hover { color:#f0c040; }
+.tab.active { color:#f0c040; border-bottom-color:#f0c040; }
+.content { padding:28px 32px; display:none; }
+.content.active { display:block; }
+.cards { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:28px; }
+.card { background:white; padding:22px; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  text-align:center; border-top:4px solid #f0c040; }
+.card h2 { font-size:34px; font-weight:700; color:#1a1a2e; font-family:'Playfair Display',serif; }
+.card p { color:#888; font-size:13px; margin-top:6px; font-weight:500; }
+.section { background:white; border-radius:14px; padding:24px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:22px; }
+.section h3 { margin-bottom:18px; color:#1a1a2e; font-size:15px; font-weight:600;
+  padding-bottom:12px; border-bottom:2px solid #f4f5f7; }
+.form-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:14px; }
+input, select { width:100%; padding:10px 14px; border:1.5px solid #e8e8e8; border-radius:8px;
+  font-size:14px; font-family:'DM Sans',sans-serif; outline:none; transition:border 0.2s;
+  background:#fafafa; color:#1a1a2e; }
+input:focus, select:focus { border-color:#f0c040; background:white; }
+.btn { padding:10px 22px; border:none; border-radius:8px; cursor:pointer; font-size:13px;
+  font-weight:600; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.btn-primary { background:#1a1a2e; color:#f0c040; }
+.btn-primary:hover { background:#0d1117; }
+.btn-success { background:#22c55e; color:white; }
+.btn-warning { background:#f59e0b; color:white; }
+.btn-danger { background:#ef4444; color:white; }
+.btn-print { background:#0ea5e9; color:white; }
+.btn-pdf { background:#8b5cf6; color:white; }
+.btn-whatsapp { background:#25d366; color:white; }
+.btn:hover { opacity:0.88; transform:translateY(-1px); }
+table { width:100%; border-collapse:collapse; font-size:13.5px; }
+th { background:#1a1a2e; color:#f0c040; padding:12px 14px; text-align:left; font-weight:600; }
+th:first-child { border-radius:8px 0 0 0; }
+th:last-child { border-radius:0 8px 0 0; }
+td { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#333; }
+tr:hover td { background:#fffbeb; }
+.badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-green { background:#dcfce7; color:#166534; }
+.badge-red { background:#fee2e2; color:#991b1b; }
+.badge-yellow { background:#fef9c3; color:#854d0e; }
+.badge-blue { background:#dbeafe; color:#1e40af; }
+.badge-purple { background:#ede9fe; color:#5b21b6; }
+.room-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+.room-box { padding:16px 10px; border-radius:10px; text-align:center;
+  cursor:pointer; font-weight:600; font-size:13px; transition:transform 0.2s; }
+.room-box:hover { transform:scale(1.05); }
+.room-available { background:#dcfce7; color:#166534; border:2px solid #22c55e; }
+.room-booked { background:#fee2e2; color:#991b1b; border:2px solid #ef4444; }
+.msg { padding:12px 16px; border-radius:8px; margin:12px 0; font-size:13px; display:none; }
+.msg-success { background:#dcfce7; color:#166534; display:block; border:1px solid #bbf7d0; }
+.msg-error { background:#fee2e2; color:#991b1b; display:block; border:1px solid #fecaca; }
+.billing-form { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.billing-summary { background:#1a1a2e; border-radius:14px; padding:24px; color:white; }
+.billing-summary h4 { font-family:'Playfair Display',serif; color:#f0c040; font-size:16px; margin-bottom:18px; }
+.summary-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.summary-row.total { font-size:18px; font-weight:700; border:none; margin-top:8px; padding-top:12px; border-top:1px solid #f0c040; color:#f0c040; }
+.modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:flex-start;
+  padding:30px; overflow-y:auto; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:white; border-radius:16px; width:100%; max-width:780px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.modal-actions { display:flex; gap:10px; padding:16px 24px; background:#f4f5f7;
+  border-bottom:1px solid #e8e8e8; flex-wrap:wrap; }
+.modal-actions .btn { font-size:13px; padding:9px 18px; }
+#invoicePrint { padding:40px 48px; font-family:'DM Sans',sans-serif; background:white; }
+.inv-header { display:flex; justify-content:space-between; align-items:flex-start;
+  padding-bottom:24px; border-bottom:3px solid #1a1a2e; margin-bottom:28px; }
+.inv-hotel-name { font-family:'Playfair Display',serif; font-size:28px; color:#1a1a2e; font-weight:700; }
+.inv-hotel-tagline { font-size:12px; color:#888; margin-top:4px; letter-spacing:1px; text-transform:uppercase; }
+.inv-hotel-details { font-size:12px; color:#555; margin-top:10px; line-height:1.8; }
+.inv-label-box { text-align:right; }
+.inv-label { font-size:28px; font-weight:700; color:#f0c040; font-family:'Playfair Display',serif; letter-spacing:2px; }
+.inv-number { font-size:13px; color:#888; margin-top:4px; }
+.inv-date { font-size:13px; color:#333; margin-top:2px; font-weight:500; }
+.inv-guest-room { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:28px; }
+.inv-box { background:#f9f9f9; border-radius:10px; padding:18px; border-left:4px solid #f0c040; }
+.inv-box-title { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; font-weight:600; margin-bottom:10px; }
+.inv-box p { font-size:13px; color:#333; line-height:1.9; }
+.inv-box strong { color:#1a1a2e; }
+.inv-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+.inv-table th { background:#1a1a2e; color:#f0c040; padding:11px 14px; font-size:12px; text-align:left; font-weight:600; }
+.inv-table td { padding:11px 14px; font-size:13px; border-bottom:1px solid #f0f0f0; color:#333; }
+.inv-table tr:nth-child(even) td { background:#fafafa; }
+.inv-totals { margin-left:auto; width:300px; }
+.inv-total-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #f0f0f0; }
+.inv-total-row.grand { font-size:16px; font-weight:700; color:#1a1a2e; border-top:2px solid #1a1a2e; border-bottom:none; padding-top:12px; margin-top:4px; }
+.inv-total-row.grand span:last-child { color:#f0c040; }
+.inv-payment { margin-top:24px; display:flex; justify-content:space-between; align-items:center; }
+.inv-payment-badge { background:#dcfce7; color:#166534; padding:8px 20px; border-radius:20px; font-weight:700; font-size:14px; border:2px solid #22c55e; }
+.inv-footer { margin-top:32px; padding-top:20px; border-top:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
+.inv-thanks { font-family:'Playfair Display',serif; font-size:18px; color:#1a1a2e; }
+.inv-signature { text-align:right; font-size:12px; color:#888; }
+.inv-signature strong { display:block; color:#1a1a2e; margin-top:20px; font-size:13px; }
+@media print {
+  body * { visibility:hidden; }
+  #invoicePrint, #invoicePrint * { visibility:visible; }
+  #invoicePrint { position:fixed; top:0; left:0; width:100%; padding:30px; }
+  .modal-actions { display:none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>🏨 Hotel Management System</h1>
+  <span id="datetime"></span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('rooms',this)">Rooms</div>
+  <div class="tab" onclick="showTab('guests',this)">Guests</div>
+  <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
+  <div class="tab" onclick="showTab('billing',this)">Billing</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="content active">
+  <div class="cards">
+    <div class="card"><h2 id="totalRooms">0</h2><p>Total Rooms</p></div>
+    <div class="card"><h2 id="availableRooms">0</h2><p>Available Rooms</p></div>
+    <div class="card"><h2 id="totalGuests">0</h2><p>Total Guests</p></div>
+    <div class="card"><h2 id="totalBookings">0</h2><p>Total Bookings</p></div>
+  </div>
+  <div class="section">
+    <h3>Room Availability Grid</h3>
+    <div class="room-grid" id="roomGrid"></div>
+  </div>
+  <div class="section">
+    <h3>Recent Bookings</h3>
+    <table>
+      <thead><tr><th>Guest</th><th>Room</th><th>Check In</th><th>Check Out</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody id="recentBookings"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ROOMS -->
+<div id="rooms" class="content">
+  <div class="section">
+    <h3>Add New Room</h3>
+    <div class="form-row">
+      <input id="roomNumber" placeholder="Room Number (e.g. 101)">
+      <select id="roomType">
+        <option value="Single">Single</option>
+        <option value="Double">Double</option>
+        <option value="Suite">Suite</option>
+        <option value="Deluxe">Deluxe</option>
+      </select>
+      <input id="roomPrice" type="number" placeholder="Price Per Night (Rs.)">
+    </div>
+    <div class="form-row">
+      <input id="roomFloor" type="number" placeholder="Floor Number">
+      <input id="roomDesc" placeholder="Description (e.g. AC room with sea view)">
+      <button class="btn btn-primary" onclick="addRoom()">+ Add Room</button>
+    </div>
+    <div id="roomMsg" class="msg"></div>
+  </div>
+  <div class="section">
+    <h3>All Rooms</h3>
+    <table>
+      <thead><tr><th>Room No</th><th>Type</th><th>Floor</th><th>Price/Night</th><th>Description</th><th>Status</th></tr></thead>
+      <tbody id="roomsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- GUESTS -->
+<div id="guests" class="content">
+  <div class="section">
+    <h3>Add New Guest</h3>
+    <div class="form-row">
+      <input id="firstName" placeholder="First Name">
+      <input id="lastName" placeholder="Last Name">
+      <input id="phone" placeholder="Phone Number">
+    </div>
+    <div class="form-row">
+      <input id="email" placeholder="Email Address">
+      <select id="idType">
+        <option value="Aadhaar">Aadhaar</option>
+        <option value="Passport">Passport</option>
+        <option value="Driving License">Driving License</option>
+        <option value="Voter ID">Voter ID</option>
+      </select>
+      <input id="idNumber" placeholder="ID Proof Number">
+    </div>
+    <div class="form-row">
+      <input id="address" placeholder="Full Address" style="grid-column:span 2">
+      <button class="btn btn-primary" onclick="addGuest()">+ Add Guest</button>
+    </div>
+    <div id="guestMsg" class="msg"></div>
+  </div>
+  <div class="section">
+    <h3>All Guests</h3>
+    <table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>ID Proof</th><th>Address</th><th>Registered</th></tr></thead>
+      <tbody id="guestsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- BOOKINGS -->
+<div id="bookings" class="content">
+  <div class="section">
+    <h3>Create New Booking</h3>
+    <div class="form-row">
+      <select id="bookingGuest"><option value="">Select Guest</option></select>
+      <select id="bookingRoom"><option value="">Select Available Room</option></select>
+      <input id="checkIn" type="date">
+    </div>
+    <div class="form-row">
+      <input id="checkOut" type="date">
+      <input id="specialReq" placeholder="Special Requests (optional)">
+      <button class="btn btn-primary" onclick="createBooking()">Create Booking</button>
+    </div>
+    <div id="bookingMsg" class="msg"></div>
+  </div>
+  <div class="section">
+    <h3>All Bookings</h3>
+    <table>
+      <thead><tr><th>Guest</th><th>Room</th><th>Check In</th><th>Check Out</th><th>Nights</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="bookingsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- BILLING -->
+<div id="billing" class="content">
+  <div class="section">
+    <h3>Generate Invoice</h3>
+    <div class="billing-form">
+      <div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:13px;color:#888;font-weight:500;display:block;margin-bottom:6px">Select Booking</label>
+          <select id="invoiceBooking" onchange="updateBillingSummary()" style="width:100%">
+            <option value="">-- Select a pending booking --</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:13px;color:#888;font-weight:500;display:block;margin-bottom:6px">Extra Charges (Rs.) — laundry, meals, minibar etc.</label>
+          <input id="extraCharges" type="number" value="0" placeholder="0" oninput="updateBillingSummary()">
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:13px;color:#888;font-weight:500;display:block;margin-bottom:6px">Payment Method</label>
+          <select id="paymentMethod" style="width:100%">
+            <option value="CASH">Cash</option>
+            <option value="CARD">Card</option>
+            <option value="UPI">UPI</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:13px;font-size:15px" onclick="generateInvoice()">Generate Invoice</button>
+        <div id="invoiceMsg" class="msg"></div>
+      </div>
+      <div class="billing-summary">
+        <h4>Bill Summary</h4>
+        <div class="summary-row"><span>Guest</span><span id="s-guest">—</span></div>
+        <div class="summary-row"><span>Room</span><span id="s-room">—</span></div>
+        <div class="summary-row"><span>Check In</span><span id="s-checkin">—</span></div>
+        <div class="summary-row"><span>Check Out</span><span id="s-checkout">—</span></div>
+        <div class="summary-row"><span>Nights</span><span id="s-nights">—</span></div>
+        <div class="summary-row"><span>Room Charges</span><span id="s-room-charges">—</span></div>
+        <div class="summary-row"><span>Extra Charges</span><span id="s-extra">Rs.0.00</span></div>
+        <div class="summary-row"><span>GST (12%)</span><span id="s-tax">—</span></div>
+        <div class="summary-row total"><span>Total</span><span id="s-total">—</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <h3>All Invoices</h3>
+    <table>
+      <thead><tr><th>Invoice No</th><th>Guest</th><th>Room</th><th>Nights</th><th>Room Charges</th><th>GST</th><th>Total</th><th>Payment</th><th>Action</th></tr></thead>
+      <tbody id="invoicesTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal-box">
+    <div class="modal-actions">
+      <button class="btn btn-print" onclick="printInvoice()">Print</button>
+      <button class="btn btn-pdf" onclick="downloadPDF()">Download PDF</button>
+      <button class="btn btn-whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+      <button class="btn btn-danger" style="margin-left:auto" onclick="closeModal()">Close</button>
+    </div>
+    <div id="invoicePrint">
+      <div class="inv-header">
+        <div>
+          <div class="inv-hotel-name">Grand Palace Hotel</div>
+          <div class="inv-hotel-tagline">Where Comfort Meets Elegance</div>
+          <div class="inv-hotel-details">
+            123 MG Road, Thrissur, Kerala - 680001<br>
+            Phone: +91 98765 43210 | Email: info@grandpalacehotel.com<br>
+            GST No: 32AABCU9603R1ZX
+          </div>
+        </div>
+        <div class="inv-label-box">
+          <div class="inv-label">INVOICE</div>
+          <div class="inv-number" id="inv-number">—</div>
+          <div class="inv-date" id="inv-date">Date: —</div>
+        </div>
+      </div>
+      <div class="inv-guest-room">
+        <div class="inv-box">
+          <div class="inv-box-title">Guest Details</div>
+          <p>
+            <strong id="inv-guest-name">—</strong><br>
+            Phone: <span id="inv-guest-phone">—</span><br>
+            Email: <span id="inv-guest-email">—</span>
+          </p>
+        </div>
+        <div class="inv-box">
+          <div class="inv-box-title">Stay Details</div>
+          <p>
+            Room <strong id="inv-room-number">—</strong> (<span id="inv-room-type">—</span>)<br>
+            Check In: <strong id="inv-checkin">—</strong><br>
+            Check Out: <strong id="inv-checkout">—</strong><br>
+            Duration: <strong><span id="inv-nights">—</span> Night(s)</strong>
+          </p>
+        </div>
+      </div>
+      <table class="inv-table">
+        <thead>
+          <tr><th>Description</th><th>Rate</th><th>Qty</th><th style="text-align:right">Amount</th></tr>
+        </thead>
+        <tbody id="inv-charges-body"></tbody>
+      </table>
+      <div class="inv-totals">
+        <div class="inv-total-row"><span>Subtotal</span><span id="inv-subtotal">—</span></div>
+        <div class="inv-total-row"><span>GST (12%)</span><span id="inv-tax">—</span></div>
+        <div class="inv-total-row grand"><span>Total Amount</span><span id="inv-total">—</span></div>
+      </div>
+      <div class="inv-payment">
+        <div>
+          <div style="font-size:12px;color:#888;margin-bottom:6px">Payment Status</div>
+          <div class="inv-payment-badge">PAID</div>
+        </div>
+        <div class="inv-payment-method">
+          Payment Method: <strong id="inv-payment-method">—</strong><br>
+          <span style="font-size:12px;color:#aaa">Amount Paid: <strong id="inv-paid">—</strong></span>
+        </div>
+      </div>
+      <div class="inv-footer">
+        <div>
+          <div class="inv-thanks">Thank you for your stay!</div>
+          <div style="font-size:12px;color:#888;margin-top:6px">We hope to see you again at Grand Palace Hotel.</div>
+        </div>
+        <div class="inv-signature">
+          <div style="font-size:11px;color:#bbb">Authorised Signatory</div>
+          <strong>Grand Palace Hotel</strong>
+          <div style="font-size:11px;color:#aaa">Computer generated invoice</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+var API = 'http://localhost:8080/api';
+var allBookings = [];
+var currentInvoice = null;
+
+setInterval(function() {
+  document.getElementById('datetime').textContent = new Date().toLocaleString('en-IN');
+}, 1000);
+
+function showTab(tab, el) {
+  document.querySelectorAll('.content').forEach(function(c) { c.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById(tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'rooms') loadRooms();
+  if (tab === 'guests') loadGuests();
+  if (tab === 'bookings') loadBookings();
+  if (tab === 'billing') loadBilling();
+}
+
+function showMsg(id, text, type) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg msg-' + type;
+  setTimeout(function() { el.className = 'msg'; }, 3500);
+}
+
+function fmt(n) {
+  return 'Rs.' + Math.abs(parseFloat(n || 0)).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function statusBadge(s) {
+  if (s === 'CONFIRMED') return 'badge-blue';
+  if (s === 'CHECKED_IN') return 'badge-green';
+  if (s === 'CHECKED_OUT') return 'badge-yellow';
+  return 'badge-red';
+}
+
+async function loadDashboard() {
+  try {
+    var rooms = await fetch(API + '/rooms').then(function(r) { return r.json(); });
+    var guests = await fetch(API + '/guests').then(function(r) { return r.json(); });
+    var bookings = await fetch(API + '/bookings').then(function(r) { return r.json(); });
+    document.getElementById('totalRooms').textContent = rooms.length;
+    document.getElementById('availableRooms').textContent = rooms.filter(function(r) { return r.available; }).length;
+    document.getElementById('totalGuests').textContent = guests.length;
+    document.getElementById('totalBookings').textContent = bookings.length;
+    document.getElementById('roomGrid').innerHTML = rooms.map(function(r) {
+      return '<div class="room-box ' + (r.available ? 'room-available' : 'room-booked') + '">' +
+        (r.available ? 'FREE' : 'BOOKED') + '<br>' + r.roomNumber +
+        '<br><small style="font-weight:400">' + r.roomType + '</small></div>';
+    }).join('');
+    document.getElementById('recentBookings').innerHTML = bookings.slice(-6).reverse().map(function(b) {
+      return '<tr><td><b>' + b.guestName + '</b></td><td>Room ' + b.roomNumber + '</td>' +
+        '<td>' + b.checkInDate + '</td><td>' + b.checkOutDate + '</td>' +
+        '<td>' + fmt(b.totalAmount) + '</td>' +
+        '<td><span class="badge ' + statusBadge(b.status) + '">' + b.status + '</span></td></tr>';
+    }).join('');
+  } catch(e) { console.error('Dashboard error:', e); }
+}
+
+async function loadRooms() {
+  var rooms = await fetch(API + '/rooms').then(function(r) { return r.json(); });
+  document.getElementById('roomsTable').innerHTML = rooms.map(function(r) {
+    return '<tr><td><b>Room ' + r.roomNumber + '</b></td><td>' + r.roomType + '</td>' +
+      '<td>Floor ' + r.floorNumber + '</td><td>' + fmt(r.pricePerNight) + '</td>' +
+      '<td style="font-size:12px;color:#888">' + (r.description || '—') + '</td>' +
+      '<td><span class="badge ' + (r.available ? 'badge-green' : 'badge-red') + '">' +
+      (r.available ? 'Available' : 'Booked') + '</span></td></tr>';
+  }).join('');
+}
+
+async function addRoom() {
+  var roomNumber = document.getElementById('roomNumber').value;
+  var roomPrice = document.getElementById('roomPrice').value;
+  if (!roomNumber || !roomPrice) { showMsg('roomMsg', 'Please fill room number and price', 'error'); return; }
+  var room = {
+    roomNumber: roomNumber,
+    roomType: document.getElementById('roomType').value,
+    pricePerNight: parseFloat(roomPrice),
+    floorNumber: parseInt(document.getElementById('roomFloor').value) || 1,
+    description: document.getElementById('roomDesc').value
+  };
+  var res = await fetch(API + '/rooms', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(room) });
+  if (res.ok) { showMsg('roomMsg', 'Room added successfully!', 'success'); loadRooms(); }
+  else showMsg('roomMsg', 'Error adding room', 'error');
+}
+
+async function loadGuests() {
+  var guests = await fetch(API + '/guests').then(function(r) { return r.json(); });
+  document.getElementById('guestsTable').innerHTML = guests.map(function(g) {
+    return '<tr><td><b>' + g.firstName + ' ' + g.lastName + '</b></td>' +
+      '<td>' + g.phone + '</td><td>' + (g.email || '—') + '</td>' +
+      '<td><span class="badge badge-purple">' + g.idProofType + '</span> ' + g.idProofNumber + '</td>' +
+      '<td style="font-size:12px;color:#888">' + (g.address || '—') + '</td>' +
+      '<td style="font-size:12px;color:#aaa">' + (g.createdAt ? g.createdAt.split('T')[0] : '—') + '</td></tr>';
+  }).join('');
+}
+
+async function addGuest() {
+  var firstName = document.getElementById('firstName').value;
+  var phone = document.getElementById('phone').value;
+  if (!firstName || !phone) { showMsg('guestMsg', 'Please fill name and phone', 'error'); return; }
+  var guest = {
+    firstName: firstName,
+    lastName: document.getElementById('lastName').value,
+    phone: phone,
+    email: document.getElementById('email').value,
+    idProofType: document.getElementById('idType').value,
+    idProofNumber: document.getElementById('idNumber').value,
+    address: document.getElementById('address').value
+  };
+  var res = await fetch(API + '/guests', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(guest) });
+  if (res.ok) { showMsg('guestMsg', 'Guest added successfully!', 'success'); loadGuests(); }
+  else showMsg('guestMsg', 'Error adding guest', 'error');
+}
+
+async function loadBookings() {
+  var guests = await fetch(API + '/guests').then(function(r) { return r.json(); });
+  var rooms = await fetch(API + '/rooms').then(function(r) { return r.json(); });
+  var bookings = await fetch(API + '/bookings').then(function(r) { return r.json(); });
+  allBookings = bookings;
+  document.getElementById('bookingGuest').innerHTML = '<option value="">Select Guest</option>' +
+    guests.map(function(g) { return '<option value="' + g.id + '">' + g.firstName + ' ' + g.lastName + ' — ' + g.phone + '</option>'; }).join('');
+  document.getElementById('bookingRoom').innerHTML = '<option value="">Select Available Room</option>' +
+    rooms.filter(function(r) { return r.available; }).map(function(r) {
+      return '<option value="' + r.id + '">Room ' + r.roomNumber + ' — ' + r.roomType + ' — ' + fmt(r.pricePerNight) + '/night</option>';
+    }).join('');
+  document.getElementById('bookingsTable').innerHTML = bookings.map(function(b) {
+    return '<tr><td><b>' + b.guestName + '</b></td>' +
+      '<td>Room ' + b.roomNumber + ' (' + b.roomType + ')</td>' +
+      '<td>' + b.checkInDate + '</td><td>' + b.checkOutDate + '</td>' +
+      '<td>' + Math.abs(b.numberOfNights) + ' night(s)</td>' +
+      '<td>' + fmt(b.totalAmount) + '</td>' +
+      '<td><span class="badge ' + statusBadge(b.status) + '">' + b.status + '</span></td>' +
+      '<td style="display:flex;gap:6px;flex-wrap:wrap">' +
+      '<button class="btn btn-success" style="padding:5px 10px;font-size:11px" onclick="checkin(\'' + b.id + '\')">Check In</button>' +
+      '<button class="btn btn-warning" style="padding:5px 10px;font-size:11px" onclick="checkout(\'' + b.id + '\')">Check Out</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+async function createBooking() {
+  var guestId = document.getElementById('bookingGuest').value;
+  var roomId = document.getElementById('bookingRoom').value;
+  var checkIn = document.getElementById('checkIn').value;
+  var checkOut = document.getElementById('checkOut').value;
+  if (!guestId || !roomId || !checkIn || !checkOut) {
+    showMsg('bookingMsg', 'Please fill all fields', 'error'); return;
+  }
+  if (new Date(checkOut) <= new Date(checkIn)) {
+    showMsg('bookingMsg', 'Check-out date must be AFTER check-in date!', 'error'); return;
+  }
+  var nights = Math.round((new Date(checkOut) - new Date(checkIn)) / (1000*60*60*24));
+  if (nights < 1) { showMsg('bookingMsg', 'Minimum 1 night required!', 'error'); return; }
+  var booking = { guestId:guestId, roomId:roomId, checkInDate:checkIn, checkOutDate:checkOut,
+    specialRequests: document.getElementById('specialReq').value };
+  var res = await fetch(API + '/bookings', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(booking) });
+  if (res.ok) { showMsg('bookingMsg', 'Booking created successfully!', 'success'); loadBookings(); }
+  else showMsg('bookingMsg', 'Error creating booking', 'error');
+}
+
+async function checkin(id) { await fetch(API + '/bookings/' + id + '/checkin', {method:'PUT'}); loadBookings(); }
+async function checkout(id) { await fetch(API + '/bookings/' + id + '/checkout', {method:'PUT'}); loadBookings(); }
+
+async function loadBilling() {
+  var bookings = await fetch(API + '/bookings').then(function(r) { return r.json(); });
+  var invoices = await fetch(API + '/invoices').then(function(r) { return r.json(); });
+  allBookings = bookings;
+  document.getElementById('invoiceBooking').innerHTML = '<option value="">-- Select a pending booking --</option>' +
+    bookings.filter(function(b) { return b.paymentStatus === 'PENDING'; }).map(function(b) {
+      return '<option value="' + b.id + '">' + b.guestName + ' — Room ' + b.roomNumber + ' — ' + fmt(b.totalAmount) + '</option>';
+    }).join('');
+  document.getElementById('invoicesTable').innerHTML = invoices.map(function(i) {
+    return '<tr>' +
+      '<td><b>' + i.invoiceNumber + '</b></td>' +
+      '<td>' + i.guestName + '</td>' +
+      '<td>Room ' + i.roomNumber + '</td>' +
+      '<td>' + Math.abs(i.numberOfNights) + '</td>' +
+      '<td>' + fmt(i.roomCharges) + '</td>' +
+      '<td>' + fmt(i.taxAmount) + '</td>' +
+      '<td><b>' + fmt(i.totalAmount) + '</b></td>' +
+      '<td><span class="badge badge-green">' + i.paymentMethod + '</span></td>' +
+      '<td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick=\'viewInvoice(' + JSON.stringify(i) + ')\'>View</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function updateBillingSummary() {
+  var bookingId = document.getElementById('invoiceBooking').value;
+  var extra = parseFloat(document.getElementById('extraCharges').value) || 0;
+  var booking = null;
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].id === bookingId) { booking = allBookings[i]; break; }
+  }
+  if (!booking) return;
+  var nights = Math.abs(booking.numberOfNights);
+  var roomAmt = Math.abs(booking.totalAmount);
+  var taxAmt = (roomAmt + extra) * 0.12;
+  var totalAmt = roomAmt + extra + taxAmt;
+  document.getElementById('s-guest').textContent = booking.guestName;
+  document.getElementById('s-room').textContent = 'Room ' + booking.roomNumber + ' (' + booking.roomType + ')';
+  document.getElementById('s-checkin').textContent = booking.checkInDate;
+  document.getElementById('s-checkout').textContent = booking.checkOutDate;
+  document.getElementById('s-nights').textContent = nights + ' night(s)';
+  document.getElementById('s-room-charges').textContent = fmt(roomAmt);
+  document.getElementById('s-extra').textContent = fmt(extra);
+  document.getElementById('s-tax').textContent = fmt(taxAmt.toFixed(2));
+  document.getElementById('s-total').textContent = fmt(totalAmt.toFixed(2));
+}
+
+async function generateInvoice() {
+  var bookingId = document.getElementById('invoiceBooking').value;
+  var extra = document.getElementById('extraCharges').value || 0;
+  var method = document.getElementById('paymentMethod').value;
+  if (!bookingId) { showMsg('invoiceMsg', 'Please select a booking', 'error'); return; }
+  var res = await fetch(API + '/invoices/generate/' + bookingId + '?extraCharges=' + extra + '&paymentMethod=' + method + '&notes=Thankyou', {method:'POST'});
+  if (res.ok) {
+    var invoice = await res.json();
+    showMsg('invoiceMsg', 'Invoice generated successfully!', 'success');
+    loadBilling();
+    setTimeout(function() { viewInvoice(invoice); }, 600);
+  } else {
+    showMsg('invoiceMsg', 'Error generating invoice', 'error');
+  }
+}
+
+function viewInvoice(inv) {
+  currentInvoice = inv;
+  var nights = Math.abs(inv.numberOfNights);
+  var roomAmt = Math.abs(inv.roomCharges);
+  var extraAmt = Math.abs(inv.extraCharges || 0);
+  var taxAmt = Math.abs(inv.taxAmount);
+  var totalAmt = Math.abs(inv.totalAmount);
+  var paidAmt = Math.abs(inv.paidAmount);
+  document.getElementById('inv-number').textContent = inv.invoiceNumber;
+  document.getElementById('inv-date').textContent = 'Date: ' + (inv.generatedAt ? inv.generatedAt.split('T')[0] : '—');
+  document.getElementById('inv-guest-name').textContent = inv.guestName;
+  document.getElementById('inv-guest-phone').textContent = inv.guestPhone || '—';
+  document.getElementById('inv-guest-email').textContent = inv.guestEmail || '—';
+  document.getElementById('inv-room-number').textContent = inv.roomNumber;
+  document.getElementById('inv-room-type').textContent = inv.roomType;
+  document.getElementById('inv-checkin').textContent = inv.checkInDate;
+  document.getElementById('inv-checkout').textContent = inv.checkOutDate;
+  document.getElementById('inv-nights').textContent = nights;
+  document.getElementById('inv-subtotal').textContent = fmt(roomAmt + extraAmt);
+  document.getElementById('inv-tax').textContent = fmt(taxAmt);
+  document.getElementById('inv-total').textContent = fmt(totalAmt);
+  document.getElementById('inv-payment-method').textContent = inv.paymentMethod;
+  document.getElementById('inv-paid').textContent = fmt(paidAmt);
+  var ratePerNight = nights > 0 ? (roomAmt / nights) : roomAmt;
+  var rows = '<tr><td>Room Charges — Room ' + inv.roomNumber + ' (' + inv.roomType + ')</td>' +
+    '<td>' + fmt(ratePerNight) + '/night</td>' +
+    '<td>' + nights + ' night(s)</td>' +
+    '<td style="text-align:right">' + fmt(roomAmt) + '</td></tr>';
+  if (extraAmt > 0) {
+    rows += '<tr><td>Extra Charges / Additional Services</td><td>—</td><td>1</td>' +
+      '<td style="text-align:right">' + fmt(extraAmt) + '</td></tr>';
+  }
+  document.getElementById('inv-charges-body').innerHTML = rows;
+  document.getElementById('invoiceModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('invoiceModal').classList.remove('open'); }
+
+function printInvoice() { window.print(); }
+
+function downloadPDF() {
+  var el = document.getElementById('invoicePrint');
+  var opt = {
+    margin: 10,
+    filename: (currentInvoice ? currentInvoice.invoiceNumber : 'invoice') + '.pdf',
+    image: {type:'jpeg', quality:0.98},
+    html2canvas: {scale:2},
+    jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+  };
+  html2pdf().set(opt).from(el).save();
+}
+
+function shareWhatsApp() {
+  if (!currentInvoice) return;
+  var msg = 'Grand Palace Hotel\n\n' +
+    'Invoice: ' + currentInvoice.invoiceNumber + '\n' +
+    'Guest: ' + currentInvoice.guestName + '\n' +
+    'Room: ' + currentInvoice.roomNumber + ' (' + currentInvoice.roomType + ')\n' +
+    'Check In: ' + currentInvoice.checkInDate + '\n' +
+    'Check Out: ' + currentInvoice.checkOutDate + '\n' +
+    'Nights: ' + Math.abs(currentInvoice.numberOfNights) + '\n\n' +
+    'Room Charges: Rs.' + Math.abs(currentInvoice.roomCharges) + '\n' +
+    'Extra Charges: Rs.' + Math.abs(currentInvoice.extraCharges || 0) + '\n' +
+    'GST (12%): Rs.' + Math.abs(currentInvoice.taxAmount) + '\n' +
+    'Total: Rs.' + Math.abs(currentInvoice.totalAmount) + '\n\n' +
+    'Payment: ' + currentInvoice.paymentMethod + ' - PAID\n\n' +
+    'Thank you for staying with us!';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
