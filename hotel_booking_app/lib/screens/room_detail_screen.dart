@@ -107,7 +107,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
       builder: (context, child) => Opacity(
         opacity: _fadeAnim.value,
         child: Container(
-          height: 320,
+          height: 340,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -132,49 +132,59 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
                 child: Icon(Icons.star, size: 100, color: Colors.white.withAlpha(12)),
               ),
               Positioned(
-                bottom: 24,
-                left: 24,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: room.isAvailable
-                            ? AppConstants.greenAccent.withAlpha(40)
-                            : AppConstants.redAccent.withAlpha(40),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
+                top: 60,
+                right: 24,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: room.isAvailable
+                        ? AppConstants.greenAccent.withAlpha(30)
+                        : AppConstants.redAccent.withAlpha(30),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: room.isAvailable
+                          ? AppConstants.greenAccent.withAlpha(80)
+                          : AppConstants.redAccent.withAlpha(80),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
                           color: room.isAvailable
-                              ? AppConstants.greenAccent.withAlpha(100)
-                              : AppConstants.redAccent.withAlpha(100),
+                              ? AppConstants.greenAccent
+                              : AppConstants.redAccent,
+                          shape: BoxShape.circle,
                         ),
                       ),
-                      child: Text(
+                      const SizedBox(width: 8),
+                      Text(
                         room.isAvailable ? 'Available' : 'Booked',
                         style: GoogleFonts.inter(
                           color: room.isAvailable
                               ? AppConstants.greenAccent
                               : AppConstants.redAccent,
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Room ${room.roomNumber}',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 24,
+                left: 24,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             color: _typeColor.withAlpha(30),
                             borderRadius: BorderRadius.circular(8),
@@ -197,6 +207,15 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Room ${room.roomNumber}',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -231,101 +250,11 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Price per Night',
-                      style: GoogleFonts.inter(
-                        color: AppConstants.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '₹${room.pricePerNight.toStringAsFixed(0)}',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: AppConstants.gold,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14),
-                          child: Text(
-                            '/night',
-                            style: GoogleFonts.inter(
-                              color: AppConstants.textSecondary,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _typeColor.withAlpha(20),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: _typeColor.withAlpha(50)),
-                  ),
-                  child: Icon(Icons.hotel, color: _typeColor, size: 28),
-                ),
-              ],
-            ),
+            _buildPriceSection(room),
             const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppConstants.surfaceDark.withAlpha(120),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withAlpha(15)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Description',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppConstants.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    room.description,
-                    style: GoogleFonts.inter(
-                      color: AppConstants.textSecondary.withAlpha(200),
-                      fontSize: 15,
-                      height: 1.6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildDescription(room),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                _buildInfoChip(Icons.meeting_room, 'Room ${room.roomNumber}'),
-                const SizedBox(width: 12),
-                _buildInfoChip(Icons.stairs, 'Floor ${room.floorNumber}'),
-                const SizedBox(width: 12),
-                _buildInfoChip(
-                  Icons.category,
-                  room.roomType,
-                ),
-              ],
-            ),
+            _buildFeaturesGrid(room),
             if (!room.isAvailable) ...[
               const SizedBox(height: 20),
               Container(
@@ -356,6 +285,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
             CustomButton(
               text: room.isAvailable ? 'Book Now' : 'Not Available',
               icon: room.isAvailable ? Icons.calendar_today : Icons.block,
+              isGradient: room.isAvailable,
               onPressed: room.isAvailable
                   ? () => _openBooking(room)
                   : null,
@@ -367,24 +297,154 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String label) {
+  Widget _buildPriceSection(RoomModel room) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Price per Night',
+              style: GoogleFonts.inter(
+                color: AppConstants.textSecondary,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '₹${room.pricePerNight.toStringAsFixed(0)}',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: AppConstants.gold,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 14),
+                  child: Text(
+                    '/night',
+                    style: GoogleFonts.inter(
+                      color: AppConstants.textSecondary,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: _typeColor.withAlpha(20),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: _typeColor.withAlpha(50)),
+          ),
+          child: Icon(Icons.hotel, color: _typeColor, size: 28),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescription(RoomModel room) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(10),
-        borderRadius: BorderRadius.circular(12),
+        color: AppConstants.surfaceDark.withAlpha(120),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withAlpha(15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Description',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppConstants.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            room.description,
+            style: GoogleFonts.inter(
+              color: AppConstants.textSecondary.withAlpha(200),
+              fontSize: 15,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturesGrid(RoomModel room) {
+    final features = [
+      {'icon': Icons.meeting_room, 'label': 'Room ${room.roomNumber}'},
+      {'icon': Icons.stairs, 'label': 'Floor ${room.floorNumber}'},
+      {'icon': Icons.category, 'label': room.roomType},
+      {'icon': Icons.king_bed, 'label': 'King Size Bed'},
+      {'icon': Icons.ac_unit, 'label': 'Air Conditioning'},
+      {'icon': Icons.wifi, 'label': 'Free WiFi'},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppConstants.surfaceDark.withAlpha(120),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withAlpha(15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Amenities',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppConstants.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: features.map((f) => _featureChip(
+              f['icon'] as IconData,
+              f['label'] as String,
+            )).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _featureChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(8),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white.withAlpha(15)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppConstants.gold),
-          const SizedBox(width: 6),
+          Icon(icon, size: 16, color: AppConstants.gold),
+          const SizedBox(width: 8),
           Text(
             label,
             style: GoogleFonts.inter(
               color: AppConstants.textSecondary,
-              fontSize: 12,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

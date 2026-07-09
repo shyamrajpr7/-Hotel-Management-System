@@ -125,6 +125,7 @@ class _BookingScreenState extends State<BookingScreen> with SingleTickerProvider
             const SizedBox(height: 24),
             CustomButton(
               text: 'Great!',
+              isGradient: true,
               onPressed: () {
                 Navigator.pop(ctx);
                 Navigator.pop(context);
@@ -232,8 +233,8 @@ class _BookingScreenState extends State<BookingScreen> with SingleTickerProvider
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          colors: [AppConstants.cardDark, AppConstants.cardDark.withAlpha(180)],
+        gradient: const LinearGradient(
+          colors: [AppConstants.cardDark, Color(0xFF151B2E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -362,14 +363,23 @@ class _BookingScreenState extends State<BookingScreen> with SingleTickerProvider
     );
   }
 
+  Color get _typeColor {
+    switch (widget.room.roomType.toLowerCase()) {
+      case 'single': return AppConstants.singleColor;
+      case 'double': return AppConstants.doubleColor;
+      case 'suite': return AppConstants.suiteColor;
+      default: return AppConstants.gold;
+    }
+  }
+
   Widget _buildSummary() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          colors: [AppConstants.cardDark, AppConstants.cardDark.withAlpha(180)],
+        gradient: const LinearGradient(
+          colors: [AppConstants.cardDark, Color(0xFF151B2E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -385,13 +395,27 @@ class _BookingScreenState extends State<BookingScreen> with SingleTickerProvider
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Booking Summary',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppConstants.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                'Booking Summary',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppConstants.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _typeColor.withAlpha(20),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _typeColor.withAlpha(40)),
+                ),
+                child: Icon(Icons.hotel, color: _typeColor, size: 18),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           _summaryRow('Room', '${widget.room.roomNumber} (${widget.room.roomType})'),
@@ -449,6 +473,7 @@ class _BookingScreenState extends State<BookingScreen> with SingleTickerProvider
         text: 'Confirm Booking',
         icon: Icons.check_circle,
         isLoading: _isBooking,
+        isGradient: true,
         onPressed: _handleBooking,
       ),
     );

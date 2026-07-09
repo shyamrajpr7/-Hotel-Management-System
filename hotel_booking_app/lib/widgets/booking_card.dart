@@ -31,9 +31,19 @@ class BookingCard extends StatelessWidget {
     }
   }
 
-  Color _statusBgColor() {
-    final c = _statusColor();
-    return c.withAlpha(30);
+  String _statusIcon() {
+    switch (booking.status.toUpperCase()) {
+      case 'CONFIRMED':
+        return '✓';
+      case 'CHECKED_IN':
+        return '→';
+      case 'CHECKED_OUT':
+        return '←';
+      case 'CANCELLED':
+        return '✕';
+      default:
+        return '•';
+    }
   }
 
   Color _roomTypeColor() {
@@ -60,10 +70,10 @@ class BookingCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppConstants.cardDark,
-            AppConstants.cardDark.withAlpha(200),
+            Color(0xFF151B2E),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -120,12 +130,12 @@ class BookingCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusBgColor(),
+                    color: statusColor.withAlpha(25),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: statusColor.withAlpha(80)),
+                    border: Border.all(color: statusColor.withAlpha(70)),
                   ),
                   child: Text(
-                    booking.status,
+                    '${_statusIcon()} ${booking.status}',
                     style: GoogleFonts.inter(
                       color: statusColor,
                       fontSize: 11,

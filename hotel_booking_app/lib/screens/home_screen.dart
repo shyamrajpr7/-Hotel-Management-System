@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? _error;
   int _selectedFilter = 0;
   late AnimationController _fadeController;
-  late Animation<double> _fadeAnim;
+  final List<AnimationController> _itemControllers = [];
 
   final List<String> _filters = ['All', 'Single', 'Double', 'Suite'];
 
@@ -37,14 +37,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
     _loadRooms();
   }
 
   @override
   void dispose() {
+    for (final c in _itemControllers) {
+      c.dispose();
+    }
     _fadeController.dispose();
     super.dispose();
   }
@@ -110,36 +110,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                     final room = _filteredRooms[index];
-                                    return AnimatedBuilder(
-                                      animation: _fadeAnim,
-                                      builder: (context, child) {
-                                        final delay = (index * 100).clamp(0, 500);
-                                        final itemAnim = CurvedAnimation(
-                                          parent: _fadeController,
-                                          curve: Interval(
-                                            delay / 2000,
-                                            (delay + 400) / 2000,
-                                            curve: Curves.easeOut,
-                                          ),
-                                        );
-                                        return AnimatedBuilder(
-                                          animation: itemAnim,
-                                          builder: (context, child) {
-                                            return Opacity(
-                                              opacity: itemAnim.value,
-                                              child: Transform.translate(
-                                                offset: Offset(0, 30 * (1 - itemAnim.value)),
-                                                child: child,
-                                              ),
-                                            );
-                                          },
-                                          child: RoomCard(
-                                            room: room,
-                                            onTap: () => _openRoomDetail(room),
-                                          ),
-                                        );
-                                      },
-                                      child: const SizedBox.shrink(),
+                                    final delay = (index * 100).clamp(0, 500);
+                                    return _AnimatedRoomCard(
+                                      room: room,
+                                      index: index,
+                                      delay: delay,
+                                      fadeController: _fadeController,
+                                      onTap: () => _openRoomDetail(room),
                                     );
                                   },
                                   childCount: _filteredRooms.length,
@@ -362,6 +339,102 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: child,
         ),
         transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
+  }
+}
+
+class _AnimatedRoomCard extends StatefulWidget {
+  final RoomModel room;
+  final int index;
+  final int delay;
+  final AnimationController fadeController;
+  final VoidCallback onTap;
+
+  const _AnimatedRoomCard({
+    required this.room,
+    required this.index,
+    required this.delay,
+    required this.fadeController,
+    required this.onTap,
+  });
+
+  @override
+  State<_AnimatedRoomCard> createState() => _AnimatedRoomCardState();
+}
+
+class _AnimatedRoomCardState extends State<_AnimatedRoomCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnim;
+  late Animation<Offset> _slideAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Interval(
+          widget.delay / 2000,
+          (widget.delay + 400) / 2000,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Interval(
+          widget.delay / 2000,
+          (widget.delay + 400) / 2000,
+          curve: Curves.easeOutCubic,
+        ),
+      ),
+    );
+
+    if (widget.fadeController.status == AnimationStatus.forward ||
+        widget.fadeController.status == AnimationStatus.completed) {
+      _controller.forward();
+    }
+    widget.fadeController.addListener(_onParentChanged);
+  }
+
+  void _onParentChanged() {
+    if (widget.fadeController.status == AnimationStatus.forward &&
+        !_controller.isAnimating) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.fadeController.removeListener(_onParentChanged);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) => Opacity(
+        opacity: _opacityAnim.value,
+        child: Transform.translate(
+          offset: Offset(0, 30 * (1 - _slideAnim.value.dy)),
+          child: child,
+        ),
+      ),
+      child: RoomCard(
+        room: widget.room,
+        onTap: widget.onTap,
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,19 +17,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late AnimationController _controller;
   late Animation<double> _scaleAnim;
   late Animation<double> _fadeAnim;
+  late Animation<double> _glowAnim;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2500),
     );
-    _scaleAnim = Tween<double>(begin: 0.5, end: 1.0).animate(
+    _scaleAnim = Tween<double>(begin: 0.3, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
     );
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 1.0, curve: Curves.easeIn)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4, 1.0, curve: Curves.easeIn)),
+    );
+    _glowAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: Curves.easeOut)),
     );
     _controller.forward();
     _navigateAfterDelay();
@@ -78,35 +83,34 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         ),
         child: Stack(
           children: [
-            ...List.generate(5, (index) => _buildParticle(index)),
+            ...List.generate(8, (index) => _buildParticle(index)),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   AnimatedBuilder(
-                    animation: _scaleAnim,
+                    animation: _controller,
                     builder: (context, child) => Transform.scale(
                       scale: _scaleAnim.value,
-                      child: child,
-                    ),
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppConstants.goldGradient,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppConstants.gold.withAlpha(80),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.hotel_class,
-                        size: 60,
-                        color: Colors.white,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: AppConstants.goldGradient,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppConstants.gold.withAlpha((80 * _glowAnim.value).round()),
+                              blurRadius: 40 + 20 * (1 - _glowAnim.value),
+                              spreadRadius: 5 + 15 * (1 - _glowAnim.value),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.hotel_class,
+                          size: 60,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -115,30 +119,32 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     animation: _fadeAnim,
                     builder: (context, child) => Opacity(
                       opacity: _fadeAnim.value,
-                      child: child,
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Royal Stay',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 42,
-                            fontWeight: FontWeight.bold,
-                            color: AppConstants.textPrimary,
-                            letterSpacing: 2,
+                      child: Column(
+                        children: [
+                          ShaderMask(
+                            shaderCallback: (bounds) => AppConstants.goldGradient.createShader(bounds),
+                            child: Text(
+                              'Royal Stay',
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 2,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Luxury Hotel & Resorts',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppConstants.goldLight,
-                            letterSpacing: 4,
-                            fontWeight: FontWeight.w300,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Luxury Hotel & Resorts',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: AppConstants.goldLight,
+                              letterSpacing: 4,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 60),
@@ -166,31 +172,38 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Widget _buildParticle(int index) {
-    final positions = [
-      const Alignment(-0.8, -0.7),
-      const Alignment(0.7, -0.6),
-      const Alignment(-0.5, 0.7),
-      const Alignment(0.8, 0.5),
-      const Alignment(0.0, -0.9),
-    ];
-    final sizes = [8.0, 12.0, 6.0, 10.0, 14.0];
-    final delays = [0, 400, 800, 200, 600];
+    final random = Random(index * 7);
+    final size = 4.0 + random.nextDouble() * 10;
+    final startX = random.nextDouble();
+    final startY = random.nextDouble();
+    final driftX = (random.nextDouble() - 0.5) * 100;
+    final driftY = -(random.nextDouble() * 60 + 20);
 
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final progress = (_controller.value * 2 + delays[index] / 1000) % 2;
-        final opacity = (1 - (progress - 1).abs()) * 0.3;
-        return Container(
-          alignment: positions[index],
+        final progress = (_controller.value + index * 0.12) % 1.0;
+        final opacity = sin(progress * pi) * 0.4;
+        final x = startX * MediaQuery.of(context).size.width + driftX * progress;
+        final y = startY * MediaQuery.of(context).size.height + driftY * progress;
+
+        return Positioned(
+          left: x,
+          top: y,
           child: Opacity(
             opacity: opacity,
             child: Container(
-              width: sizes[index],
-              height: sizes[index],
+              width: size,
+              height: size,
               decoration: BoxDecoration(
-                color: AppConstants.gold,
+                color: index.isEven ? AppConstants.gold : AppConstants.goldLight,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppConstants.gold.withAlpha(60),
+                    blurRadius: size,
+                  ),
+                ],
               ),
             ),
           ),

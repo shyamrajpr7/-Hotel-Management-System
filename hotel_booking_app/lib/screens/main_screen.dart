@@ -57,10 +57,10 @@ class _MainScreenState extends State<MainScreen> {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [
               AppConstants.surfaceDark,
-              AppConstants.surfaceDark.withAlpha(200),
+              Color(0xFF151B2E),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
           border: Border.all(color: Colors.white.withAlpha(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(120),
+              color: AppConstants.gold.withAlpha(15),
               blurRadius: 25,
               offset: const Offset(0, 10),
             ),

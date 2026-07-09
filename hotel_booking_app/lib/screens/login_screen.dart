@@ -19,11 +19,9 @@ class _LoginScreenState extends State<LoginScreen>
   late TabController _tabController;
   final _apiService = ApiService();
 
-  // Sign In controllers
   final _signInPhoneController = TextEditingController();
   bool _isSigningIn = false;
 
-  // Sign Up controllers
   final _signUpFirstNameController = TextEditingController();
   final _signUpLastNameController = TextEditingController();
   final _signUpPhoneController = TextEditingController();
@@ -33,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen>
   String _idProofType = 'Aadhaar';
   bool _isSigningUp = false;
 
-  // Animation
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
@@ -72,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  // ─── Sign In ──────────────────────────────────────────────
   Future<void> _handleSignIn() async {
     final phone = _signInPhoneController.text.trim();
     if (phone.isEmpty) {
@@ -99,7 +95,6 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  // ─── Sign Up ──────────────────────────────────────────────
   Future<void> _handleSignUp() async {
     if (_signUpFirstNameController.text.trim().isEmpty ||
         _signUpLastNameController.text.trim().isEmpty ||
@@ -160,7 +155,6 @@ class _LoginScreenState extends State<LoginScreen>
     ));
   }
 
-  // ─── Build ────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,11 +188,9 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Header ───────────────────────────────────────────────
   Widget _buildHeader() {
     return Column(
       children: [
-        // Hotel Icon
         Container(
           width: 80,
           height: 80,
@@ -216,13 +208,16 @@ class _LoginScreenState extends State<LoginScreen>
           child: const Icon(Icons.hotel, size: 40, color: Colors.white),
         ),
         const SizedBox(height: 20),
-        Text(
-          'Grand Hotel',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 34,
-            fontWeight: FontWeight.bold,
-            color: AppConstants.textPrimary,
-            letterSpacing: 1.2,
+        ShaderMask(
+          shaderCallback: (bounds) => AppConstants.goldGradient.createShader(bounds),
+          child: Text(
+            'Grand Hotel',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 34,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
         const SizedBox(height: 6),
@@ -238,15 +233,14 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Tab Card ─────────────────────────────────────────────
   Widget _buildTabCard() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppConstants.cardDark,
-            AppConstants.cardDark.withAlpha(200),
+            Color(0xFF151B2E),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -262,12 +256,10 @@ class _LoginScreenState extends State<LoginScreen>
       ),
       child: Column(
         children: [
-          // Tab Toggle
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: _buildTabToggle(),
           ),
-          // Tab Content
           AnimatedSize(
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeInOut,
@@ -288,7 +280,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Animated Tab Toggle ──────────────────────────────────
   Widget _buildTabToggle() {
     return AnimatedBuilder(
       animation: _tabController.animation!,
@@ -352,7 +343,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Sign In Form ─────────────────────────────────────────
   Widget _buildSignInForm() {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -388,6 +378,7 @@ class _LoginScreenState extends State<LoginScreen>
             text: 'Sign In',
             isLoading: _isSigningIn,
             icon: Icons.login_rounded,
+            isGradient: true,
             onPressed: _handleSignIn,
           ),
           const SizedBox(height: 16),
@@ -420,7 +411,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Sign Up Form ─────────────────────────────────────────
   Widget _buildSignUpForm() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -498,6 +488,7 @@ class _LoginScreenState extends State<LoginScreen>
             text: 'Create Account',
             isLoading: _isSigningUp,
             icon: Icons.person_add_rounded,
+            isGradient: true,
             onPressed: _handleSignUp,
           ),
           const SizedBox(height: 16),
@@ -530,7 +521,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── ID Proof Dropdown ────────────────────────────────────
   Widget _buildIdProofDropdown() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -574,7 +564,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Reusable Input ───────────────────────────────────────
   Widget _inputField({
     required TextEditingController controller,
     required String label,
@@ -610,20 +599,13 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ─── Divider ──────────────────────────────────────────────
   Widget _buildDivider() {
     return Row(
       children: [
         Expanded(child: Divider(color: Colors.white.withAlpha(20))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            '🏨  Enjoy your stay',
-            style: GoogleFonts.inter(
-              color: AppConstants.textSecondary,
-              fontSize: 12,
-            ),
-          ),
+          child: Icon(Icons.hotel, color: AppConstants.gold.withAlpha(100), size: 18),
         ),
         Expanded(child: Divider(color: Colors.white.withAlpha(20))),
       ],

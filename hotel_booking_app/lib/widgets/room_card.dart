@@ -40,36 +40,43 @@ class RoomCard extends StatelessWidget {
     final typeColor = _roomTypeColor();
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [
-              AppConstants.cardDark,
-              AppConstants.cardDark.withAlpha(200),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: typeColor.withAlpha(25),
+                blurRadius: 25,
+                offset: const Offset(0, 10),
+              ),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-          border: Border.all(
-            color: Colors.white.withAlpha(30),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(80),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                colors: [
+                  AppConstants.cardDark,
+                  Color(0xFF151B2E),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(
+                color: Colors.white.withAlpha(25),
+                width: 1,
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImageHeader(typeColor),
-            _buildDetails(typeColor),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageHeader(typeColor),
+                _buildDetails(typeColor),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -77,12 +84,12 @@ class RoomCard extends StatelessWidget {
 
   Widget _buildImageHeader(Color typeColor) {
     return Container(
-      height: 160,
+      height: 170,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            typeColor.withAlpha(100),
-            typeColor.withAlpha(40),
+            typeColor.withAlpha(80),
+            typeColor.withAlpha(30),
             AppConstants.cardDark,
           ],
           begin: Alignment.topCenter,
@@ -96,19 +103,19 @@ class RoomCard extends StatelessWidget {
             right: -20,
             child: Icon(
               Icons.hotel,
-              size: 120,
-              color: Colors.white.withAlpha(15),
+              size: 140,
+              color: Colors.white.withAlpha(12),
             ),
           ),
           Positioned(
-            bottom: 60,
+            bottom: 70,
             left: 20,
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: typeColor.withAlpha(30),
+                color: typeColor.withAlpha(25),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: typeColor.withAlpha(60), width: 1),
+                border: Border.all(color: typeColor.withAlpha(50), width: 1),
               ),
               child: Icon(
                 _roomTypeIcon(),
@@ -124,24 +131,40 @@ class RoomCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: room.isAvailable
-                    ? AppConstants.greenAccent.withAlpha(40)
-                    : AppConstants.redAccent.withAlpha(40),
+                    ? AppConstants.greenAccent.withAlpha(30)
+                    : AppConstants.redAccent.withAlpha(30),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: room.isAvailable
-                      ? AppConstants.greenAccent.withAlpha(100)
-                      : AppConstants.redAccent.withAlpha(100),
+                      ? AppConstants.greenAccent.withAlpha(80)
+                      : AppConstants.redAccent.withAlpha(80),
                 ),
               ),
-              child: Text(
-                room.isAvailable ? 'Available' : 'Booked',
-                style: GoogleFonts.inter(
-                  color: room.isAvailable
-                      ? AppConstants.greenAccent
-                      : AppConstants.redAccent,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: room.isAvailable
+                          ? AppConstants.greenAccent
+                          : AppConstants.redAccent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    room.isAvailable ? 'Available' : 'Booked',
+                    style: GoogleFonts.inter(
+                      color: room.isAvailable
+                          ? AppConstants.greenAccent
+                          : AppConstants.redAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -159,11 +182,11 @@ class RoomCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: typeColor.withAlpha(30),
+                    color: typeColor.withAlpha(25),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

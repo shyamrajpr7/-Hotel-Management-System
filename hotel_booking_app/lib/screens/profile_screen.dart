@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 import '../services/api_service.dart';
 import '../models/guest_model.dart';
+import '../models/booking_model.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   final _apiService = ApiService();
   GuestModel? _guest;
+  List<BookingModel> _bookings = [];
   bool _isLoading = true;
   String? _error;
   late AnimationController _animController;
@@ -53,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       if (_guest == null) {
         _guest = await _apiService.findGuestByPhone('');
       }
+      _bookings = await _apiService.getBookingsByGuest(widget.guestId);
       _animController.forward();
     } catch (e) {
       setState(() => _error = e.toString());
@@ -206,6 +209,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   Widget _buildProfile() {
     final guest = _guest!;
+    final activeBookings = _bookings.where((b) =>
+      b.status == 'CONFIRMED' || b.status == 'CHECKED_IN').length;
+    final totalSpent = _bookings.fold<double>(
+      0, (sum, b) => sum + b.totalAmount);
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(24),
@@ -255,11 +263,71 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          _buildStatsRow(activeBookings, totalSpent),
+          const SizedBox(height: 20),
           _buildInfoCard(guest),
           const SizedBox(height: 20),
           _buildLogoutButton(),
           const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(int activeBookings, double totalSpent) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          colors: [AppConstants.cardDark, Color(0xFF151B2E)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: Colors.white.withAlpha(20)),
+      ),
+      child: Row(
+        children: [
+          _statItem(Icons.calendar_today, '$activeBookings', 'Active'),
+          Container(
+            width: 1,
+            height: 40,
+            color: Colors.white.withAlpha(15),
+          ),
+          _statItem(Icons.payments, '₹${totalSpent.toStringAsFixed(0)}', 'Total Spent'),
+          Container(
+            width: 1,
+            height: 40,
+            color: Colors.white.withAlpha(15),
+          ),
+          _statItem(Icons.hotel, '${_bookings.length}', 'Total'),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(IconData icon, String value, String label) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: AppConstants.gold, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppConstants.textPrimary,
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: AppConstants.textSecondary,
+            ),
+          ),
         ],
       ),
     );
@@ -270,8 +338,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          colors: [AppConstants.cardDark, AppConstants.cardDark.withAlpha(180)],
+        gradient: const LinearGradient(
+          colors: [AppConstants.cardDark, Color(0xFF151B2E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

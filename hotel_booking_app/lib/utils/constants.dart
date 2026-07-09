@@ -20,6 +20,10 @@ class AppConstants {
   static const Color doubleColor = Color(0xFF10B981);
   static const Color suiteColor = Color(0xFFF59E0B);
 
+  static const Color glassBorder = Color(0x33FFFFFF);
+  static const Color glassBg = Color(0x14FFFFFF);
+  static const Color overlayDark = Color(0x80000000);
+
   static LinearGradient get goldGradient => const LinearGradient(
     colors: [gold, amber],
     begin: Alignment.topLeft,
@@ -39,5 +43,11 @@ class AppConstants {
       Color(0xFF1A1F2E),
     ],
     stops: [0.0, 0.5, 1.0],
+  );
+
+  static LinearGradient get glassGradient => const LinearGradient(
+    colors: [Color(0x1AFFFFFF), Color(0x0AFFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 }

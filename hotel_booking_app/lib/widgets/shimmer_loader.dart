@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../utils/constants.dart';
 
 class ShimmerLoader extends StatelessWidget {
   final int itemCount;
@@ -10,7 +11,7 @@ class ShimmerLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       baseColor: const Color(0xFF1A1F2E),
-      highlightColor: const Color(0xFF2A3045),
+      highlightColor: const Color(0xFF2E354A),
       period: const Duration(milliseconds: 1500),
       child: ListView.builder(
         shrinkWrap: true,
@@ -87,7 +88,7 @@ class ShimmerBookingLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       baseColor: const Color(0xFF1A1F2E),
-      highlightColor: const Color(0xFF2A3045),
+      highlightColor: const Color(0xFF2E354A),
       period: const Duration(milliseconds: 1500),
       child: ListView.builder(
         shrinkWrap: true,

@@ -7,6 +7,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final bool isOutlined;
+  final bool isGradient;
   final IconData? icon;
   final double? width;
   final Color? color;
@@ -17,6 +18,7 @@ class CustomButton extends StatelessWidget {
     this.onPressed,
     this.isLoading = false,
     this.isOutlined = false,
+    this.isGradient = false,
     this.icon,
     this.width,
     this.color,
@@ -45,19 +47,40 @@ class CustomButton extends StatelessWidget {
 
     return SizedBox(
       width: width ?? double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: buttonColor,
-          disabledBackgroundColor: buttonColor.withAlpha(100),
-          elevation: 8,
-          shadowColor: buttonColor.withAlpha(100),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: isGradient ? AppConstants.goldGradient : null,
+          boxShadow: isGradient
+              ? [
+                  BoxShadow(
+                    color: AppConstants.gold.withAlpha(80),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: buttonColor.withAlpha(100),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
         ),
-        child: _buildChild(Colors.white),
+        child: ElevatedButton(
+          onPressed: isLoading ? null : onPressed,
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            backgroundColor: isGradient ? Colors.transparent : buttonColor,
+            disabledBackgroundColor: (isGradient ? AppConstants.gold : buttonColor).withAlpha(100),
+            shadowColor: Colors.transparent,
+            elevation: 0,
+          ),
+          child: _buildChild(isGradient ? Colors.white : Colors.white),
+        ),
       ),
     );
   }
